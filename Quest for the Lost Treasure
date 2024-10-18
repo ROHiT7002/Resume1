@@ -1,0 +1,145 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib> // For rand()
+#include <ctime>   // For time()
+using namespace std;
+
+struct Player {
+    int health;
+    int strength;
+    int intelligence;
+    vector<string> inventory;
+};
+
+// Function declarations
+void forestAdventure(Player &player);
+void riverChallenge(Player &player);
+void caveAdventure(Player &player);
+void randomEncounter(Player &player);
+void displayStats(const Player &player);
+
+int main() {
+    Player player = {100, 10, 10, {}}; // Create a Player object with initial stats( health - 100, strength - 10, intelligence - 10, inventory)
+    char playAgain;
+    bool gameOver = false;
+
+    srand(static_cast<unsigned int>(time(0))); // Seed the random number generator with current time
+
+    cout << "Welcome to the Ultimate Adventure Game!\n";
+    cout << "Your mission is to survive and find the treasure hidden in the forest.\n";
+    cout << "You have three stats: Health, Strength, and Intelligence.\n\n";
+
+    while (!gameOver) {
+        forestAdventure(player); // Call the forestAdventure function with player object
+        cout << "Do you want to play again? (y/n): ";
+        cin >> playAgain;
+        if (playAgain == 'n' || playAgain == 'N') {
+            gameOver = true;
+            cout << "Thanks for playing!\n";
+        } else {
+            player.health = 100; // Reset player's health
+            player.strength = 10; // Reset player's strength
+            player.intelligence = 10; // Reset player's intelligence
+            player.inventory.clear(); // Clear the player's inventory
+        }
+    }
+
+    return 0;
+}
+
+// Function to handle the forest scenario
+void forestAdventure(Player &player) {
+    int choice;
+    cout << "You are in the forest. ";
+    displayStats(player);
+    cout << "You can either:\n";
+    cout << "1. Search for items\n";
+    cout << "2. Continue walking\n";
+    cout << "What do you want to do? (Enter 1 or 2): ";
+    cin >> choice;
+
+    if (choice == 1) {
+        randomEncounter(player);
+    } else {
+        riverChallenge(player);
+    }
+}
+
+// Function to handle random encounters in the forest
+void randomEncounter(Player &player) {
+    int event = rand() % 3; // Generate a random event (0, 1, or 2)
+    if (event == 0) {
+        cout << "You encountered a wild animal! You fight it with your strength.\n";
+        if (player.strength > 8) {
+            cout << "You defeated the animal and gained 20 health.\n";
+            player.health += 20;
+        } else {
+            cout << "The animal injured you. You lose 20 health.\n";
+            player.health -= 20;
+        }
+    } else if (event == 1) {
+        cout << "You found a hidden treasure chest with a sword!\n";
+        player.inventory.push_back("Sword");
+    } else {
+        cout << "You stumbled upon a trap! You lose 10 health.\n";
+        player.health -= 10;
+    }
+    riverChallenge(player);
+}
+
+// Function to handle the river scenario
+void riverChallenge(Player &player) {
+    int choice;
+    cout << "You come across a river. ";
+    displayStats(player);
+    cout << "You can either:\n";
+    cout << "1. Swim across (Costs 30 health)\n";
+    cout << "2. Use your intelligence to build a raft (requires intelligence > 8)\n";
+    cout << "What do you want to do? (Enter 1 or 2): ";
+    cin >> choice;
+
+    if (choice == 1) {
+        player.health -= 30;
+        if (player.health > 0) {
+            cout << "You swam across. Health is now " << player.health << "\n";
+        } else {
+            cout << "You lost all your health and drowned.\nGAME OVER!\n";
+            return;
+        }
+    } else if (choice == 2 && player.intelligence > 8) {
+        cout << "You successfully built a raft and crossed the river safely.\n";
+    } else {
+        cout << "You don't have enough intelligence to build the raft and wasted time.\n";
+        player.health -= 20;
+    }
+
+    caveAdventure(player);
+}
+
+// Function to handle the cave scenario
+void caveAdventure(Player &player) {
+    int choice;
+    cout << "You reach a cave. ";
+    displayStats(player);
+    cout << "You can either:\n";
+    cout << "1. Enter the cave\n";
+    cout << "2. Walk away\n";
+    cout << "What do you want to do? (Enter 1 or 2): ";
+    cin >> choice;
+
+    if (choice == 1) {
+        if (!player.inventory.empty()) {
+            cout << "Using the sword you found, you fend off the guardians of the cave and find the hidden treasure!\n";
+            cout << "Congratulations, you won the game!\n";
+        } else {
+            cout << "Without any weapons, you were defeated by the cave guardians.\nGAME OVER!\n";
+        }
+    } else {
+        cout << "You walk away from the cave and the adventure ends.\n";
+    }
+}
+
+// Function to display player's current stats
+void displayStats(const Player &player) {
+    cout << "Your stats are - Health: " << player.health << ", Strength: " << player.strength << ", Intelligence: " << player.intelligence << "\n";
+}
